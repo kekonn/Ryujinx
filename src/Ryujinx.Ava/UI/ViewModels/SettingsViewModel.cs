@@ -302,9 +302,18 @@ namespace Ryujinx.Ava.UI.ViewModels
 
         public void CheckSoundBackends()
         {
-            IsOpenAlEnabled = OpenALHardwareDeviceDriver.IsSupported;
-            IsSoundIoEnabled = SoundIoHardwareDeviceDriver.IsSupported;
-            IsSDL2Enabled = SDL2HardwareDeviceDriver.IsSupported;
+            if (Avalonia.Controls.Design.IsDesignMode)
+            {
+                IsOpenAlEnabled = false;
+                IsSoundIoEnabled = false;
+                IsSDL2Enabled = false;
+            }
+            else
+            {
+                IsOpenAlEnabled = OpenALHardwareDeviceDriver.IsSupported;
+                IsSoundIoEnabled = SoundIoHardwareDeviceDriver.IsSupported;
+                IsSDL2Enabled = SDL2HardwareDeviceDriver.IsSupported;
+            }
         }
 
         private void LoadAvailableGpus()
