@@ -366,6 +366,16 @@ namespace Ryujinx.Ui.Common.Configuration
         public bool UseHypervisor { get; set; }
 
         /// <summary>
+        /// Enables save game sync
+        /// </summary>
+        public bool SaveGameSyncEnabled { get; set; }
+
+        /// <summary>
+        /// The path to sync save games to
+        /// </summary>
+        public string SaveGameSyncPath { get; set; }
+
+        /// <summary>
         /// Loads a configuration file from disk
         /// </summary>
         /// <param name="path">The path to the JSON configuration file</param>

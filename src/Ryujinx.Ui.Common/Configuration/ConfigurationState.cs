@@ -363,6 +363,16 @@ namespace Ryujinx.Ui.Common.Configuration
             /// </summary>
             public ReactiveObject<bool> UseHypervisor { get; private set; }
 
+            /// <summary>
+            /// Enable syncing save games to the sync path
+            /// </summary>
+            public ReactiveObject<bool> SaveGameSyncEnabled { get; private set; }
+
+            /// <summary>
+            /// The path to sync save games to
+            /// </summary>
+            public ReactiveObject<string> SaveGameSyncPath { get; private set; }
+
             public SystemSection()
             {
                 Language                      = new ReactiveObject<Language>();
@@ -391,6 +401,10 @@ namespace Ryujinx.Ui.Common.Configuration
                 AudioVolume.Event             += static (sender, e) => LogValueChange(sender, e, nameof(AudioVolume));
                 UseHypervisor                 = new ReactiveObject<bool>();
                 UseHypervisor.Event           += static (sender, e) => LogValueChange(sender, e, nameof(UseHypervisor));
+                SaveGameSyncEnabled           = new ReactiveObject<bool>();
+                SaveGameSyncEnabled.Event     += static (sender, e) => LogValueChange(sender, e, nameof(SaveGameSyncEnabled));
+                SaveGameSyncPath              = new ReactiveObject<string>();
+                SaveGameSyncPath.Event        += static (sender, e) => LogValueChange(sender, e, nameof(SaveGameSyncPath));
             }
         }
 
@@ -677,6 +691,8 @@ namespace Ryujinx.Ui.Common.Configuration
                 ExpandRam                  = System.ExpandRam,
                 IgnoreMissingServices      = System.IgnoreMissingServices,
                 UseHypervisor              = System.UseHypervisor,
+                SaveGameSyncEnabled        = System.SaveGameSyncEnabled,
+                SaveGameSyncPath           = System.SaveGameSyncPath,
                 GuiColumns                 = new GuiColumns
                 {
                     FavColumn        = Ui.GuiColumns.FavColumn,

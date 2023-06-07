@@ -165,7 +165,20 @@
                         </ComboBoxItem>
                     </ComboBox>
                 </Grid>
-            </StackPanel>
+                <Separator Height="1" />
+                <TextBlock Classes="h1" Text="Save Game Export" />
+                <StackPanel Margin="10,0,0,0"
+                            HorizontalAlignment="Stretch"
+                            Orientation="Vertical"
+                            Spacing="10">
+                    <CheckBox IsChecked="{Binding SaveGameSyncEnabled}" 
+                              Content="Enable automatic save game export" />
+                    <TextBlock Text="Save game export target root folder" />
+                    <TextBox IsEnabled="{Binding SaveGameSyncEnabled}" 
+                             Text="{Binding SaveGameSyncPath}" 
+                             />
+                </StackPanel>
+                </StackPanel>
         </Border>
     </ScrollViewer>
 </UserControl>

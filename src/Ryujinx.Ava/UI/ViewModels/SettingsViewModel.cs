@@ -51,6 +51,8 @@ namespace Ryujinx.Ava.UI.ViewModels
         private string _customThemePath;
         private int _scalingFilter;
         private int _scalingFilterLevel;
+        private bool _saveGameSyncEnabled;
+        private string _saveGameSyncPath;
 
         public event Action CloseWindow;
         public event Action SaveSettingsEvent;
@@ -65,6 +67,29 @@ namespace Ryujinx.Ava.UI.ViewModels
 
                 OnPropertyChanged(nameof(CustomResolutionScale));
                 OnPropertyChanged(nameof(IsCustomResolutionScaleActive));
+            }
+        }
+
+        public bool SaveGameSyncEnabled
+        {
+            get => _saveGameSyncEnabled;
+            set
+            {
+                _saveGameSyncEnabled = value;
+                
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SaveGameSyncPath));
+            }
+        }
+
+        public string SaveGameSyncPath
+        {
+            get => _saveGameSyncPath;
+            set
+            {
+                _saveGameSyncPath = value;
+                
+                OnPropertyChanged();
             }
         }
 
@@ -302,17 +327,17 @@ namespace Ryujinx.Ava.UI.ViewModels
 
         public void CheckSoundBackends()
         {
-            if (Avalonia.Controls.Design.IsDesignMode)
-            {
-                IsOpenAlEnabled = false;
-                IsSoundIoEnabled = false;
-                IsSDL2Enabled = false;
-            }
-            else
+            if (!Avalonia.Controls.Design.IsDesignMode)
             {
                 IsOpenAlEnabled = OpenALHardwareDeviceDriver.IsSupported;
                 IsSoundIoEnabled = SoundIoHardwareDeviceDriver.IsSupported;
                 IsSDL2Enabled = SDL2HardwareDeviceDriver.IsSupported;
+            }
+            else
+            {
+                IsOpenAlEnabled = false;
+                IsSoundIoEnabled = false;
+                IsSDL2Enabled = false;
             }
         }
 
@@ -407,6 +432,9 @@ namespace Ryujinx.Ava.UI.ViewModels
             Region = (int)config.System.Region.Value;
             Language = (int)config.System.Language.Value;
             TimeZone = config.System.TimeZone;
+
+            SaveGameSyncEnabled = config.System.SaveGameSyncEnabled.Value;
+            SaveGameSyncPath = config.System.SaveGameSyncPath.Value;
 
             DateTime currentDateTime = DateTime.Now;
 
@@ -504,6 +532,8 @@ namespace Ryujinx.Ava.UI.ViewModels
             config.System.EnableFsIntegrityChecks.Value = EnableFsIntegrityChecks;
             config.System.ExpandRam.Value = ExpandDramSize;
             config.System.IgnoreMissingServices.Value = IgnoreMissingServices;
+            config.System.SaveGameSyncEnabled.Value = SaveGameSyncEnabled;
+            config.System.SaveGameSyncPath.Value = SaveGameSyncPath;
 
             // CPU
             config.System.EnablePtc.Value = EnablePptc;
