@@ -183,6 +183,16 @@ namespace Ryujinx.Ui.Common.Configuration
             /// Sets if Grid is ordered in Ascending Order
             /// </summary>
             public ReactiveObject<bool> IsAscendingOrder { get; private set; }
+            
+            /// <summary>
+            /// Enable syncing save games to the sync path
+            /// </summary>
+            public ReactiveObject<bool> SaveGameSyncEnabled { get; private set; }
+
+            /// <summary>
+            /// The path to sync save games to
+            /// </summary>
+            public ReactiveObject<string> SaveGameSyncPath { get; private set; }
 
             public UiSection()
             {
@@ -203,6 +213,10 @@ namespace Ryujinx.Ui.Common.Configuration
                 LanguageCode      = new ReactiveObject<string>();
                 ShowConsole       = new ReactiveObject<bool>();
                 ShowConsole.Event += static (s, e) => { ConsoleHelper.SetConsoleWindowState(e.NewValue); };
+                SaveGameSyncEnabled           = new ReactiveObject<bool>();
+                SaveGameSyncEnabled.Event     += static (sender, e) => LogValueChange(sender, e, nameof(SaveGameSyncEnabled));
+                SaveGameSyncPath              = new ReactiveObject<string>();
+                SaveGameSyncPath.Event        += static (sender, e) => LogValueChange(sender, e, nameof(SaveGameSyncPath));
             }
         }
 
@@ -363,15 +377,6 @@ namespace Ryujinx.Ui.Common.Configuration
             /// </summary>
             public ReactiveObject<bool> UseHypervisor { get; private set; }
 
-            /// <summary>
-            /// Enable syncing save games to the sync path
-            /// </summary>
-            public ReactiveObject<bool> SaveGameSyncEnabled { get; private set; }
-
-            /// <summary>
-            /// The path to sync save games to
-            /// </summary>
-            public ReactiveObject<string> SaveGameSyncPath { get; private set; }
 
             public SystemSection()
             {
@@ -401,10 +406,6 @@ namespace Ryujinx.Ui.Common.Configuration
                 AudioVolume.Event             += static (sender, e) => LogValueChange(sender, e, nameof(AudioVolume));
                 UseHypervisor                 = new ReactiveObject<bool>();
                 UseHypervisor.Event           += static (sender, e) => LogValueChange(sender, e, nameof(UseHypervisor));
-                SaveGameSyncEnabled           = new ReactiveObject<bool>();
-                SaveGameSyncEnabled.Event     += static (sender, e) => LogValueChange(sender, e, nameof(SaveGameSyncEnabled));
-                SaveGameSyncPath              = new ReactiveObject<string>();
-                SaveGameSyncPath.Event        += static (sender, e) => LogValueChange(sender, e, nameof(SaveGameSyncPath));
             }
         }
 
@@ -691,8 +692,8 @@ namespace Ryujinx.Ui.Common.Configuration
                 ExpandRam                  = System.ExpandRam,
                 IgnoreMissingServices      = System.IgnoreMissingServices,
                 UseHypervisor              = System.UseHypervisor,
-                SaveGameSyncEnabled        = System.SaveGameSyncEnabled,
-                SaveGameSyncPath           = System.SaveGameSyncPath,
+                SaveGameSyncEnabled        = Ui.SaveGameSyncEnabled,
+                SaveGameSyncPath           = Ui.SaveGameSyncPath,
                 GuiColumns                 = new GuiColumns
                 {
                     FavColumn        = Ui.GuiColumns.FavColumn,
@@ -1493,6 +1494,8 @@ namespace Ryujinx.Ui.Common.Configuration
             Ui.WindowStartup.WindowPositionX.Value    = configurationFileFormat.WindowStartup.WindowPositionX;
             Ui.WindowStartup.WindowPositionY.Value    = configurationFileFormat.WindowStartup.WindowPositionY;
             Ui.WindowStartup.WindowMaximized.Value    = configurationFileFormat.WindowStartup.WindowMaximized;
+            Ui.SaveGameSyncEnabled.Value              = configurationFileFormat.SaveGameSyncEnabled;
+            Ui.SaveGameSyncPath.Value                 = configurationFileFormat.SaveGameSyncPath;
             Hid.EnableKeyboard.Value                  = configurationFileFormat.EnableKeyboard;
             Hid.EnableMouse.Value                     = configurationFileFormat.EnableMouse;
             Hid.Hotkeys.Value                         = configurationFileFormat.Hotkeys;

@@ -26,6 +26,10 @@
         Header="{locale:Locale GameListContextMenuOpenBcatSaveDirectory}"
         IsEnabled="{Binding OpenBcatSaveDirectoryEnabled}"
         ToolTip.Tip="{locale:Locale GameListContextMenuOpenBcatSaveDirectoryToolTip}" />
+    <MenuItem
+        Click="OpenSaveGameBackupDirectory_Click"
+        Header="Open save game backup directory"
+        IsEnabled="{Binding OpenSaveGameBackupDirectoryEnabled}"/>
     <Separator />
     <MenuItem
         Click="OpenTitleUpdateManager_Click"

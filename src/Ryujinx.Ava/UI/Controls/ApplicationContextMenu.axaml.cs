@@ -10,8 +10,10 @@ using Ryujinx.Ava.UI.Helpers;
 using Ryujinx.Ava.UI.ViewModels;
 using Ryujinx.Ava.UI.Windows;
 using Ryujinx.Common.Configuration;
+using Ryujinx.Common.Utilities;
 using Ryujinx.Ui.App.Common;
 using Ryujinx.HLE.HOS;
+using Ryujinx.Ui.Common.Configuration;
 using Ryujinx.Ui.Common.Helper;
 using System;
 using System.Collections.Generic;
@@ -332,6 +334,48 @@ namespace Ryujinx.Ava.UI.Controls
             {
                 viewModel.LoadApplication(viewModel.SelectedApplication.Path);
             }
+        }
+
+        private void OpenSaveGameBackupDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = (sender as MenuItem)?.DataContext as MainWindowViewModel;
+
+            if (viewModel?.SelectedApplication is null)
+            {
+                return;
+            }
+
+            if (!ulong.TryParse(viewModel.SelectedApplication.TitleId, NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture, out ulong titleIdNumber))
+            {
+                Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(
+                        LocaleManager.Instance[LocaleKeys.DialogRyujinxErrorMessage],
+                        LocaleManager.Instance[LocaleKeys.DialogInvalidTitleIdErrorMessage]);
+                });
+
+                return;
+            }
+
+            var saveGameHelper = new SaveGameHelper(ConfigurationState.Instance.Ui.SaveGameSyncPath.Value);
+            var backupFolderFound =
+                saveGameHelper.TryFindExportPathForTitleId(viewModel.SelectedApplication.TitleId,
+                    out var backupFolderPath);
+
+            if (!backupFolderFound)
+            {
+                Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(
+                        LocaleManager.Instance[LocaleKeys.DialogRyujinxErrorMessage],
+                        "Could not find a save game backup directory.");
+                });
+
+                return;
+            }
+            
+            OpenHelper.OpenFolder(backupFolderPath);
         }
     }
 }

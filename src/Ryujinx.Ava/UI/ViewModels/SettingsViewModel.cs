@@ -412,6 +412,8 @@ namespace Ryujinx.Ava.UI.ViewModels
             CheckUpdatesOnStart = config.CheckUpdatesOnStart;
             ShowConfirmExit = config.ShowConfirmExit;
             HideCursor = (int)config.HideCursor.Value;
+            SaveGameSyncEnabled = config.Ui.SaveGameSyncEnabled.Value;
+            SaveGameSyncPath = config.Ui.SaveGameSyncPath.Value;
 
             GameDirectories.Clear();
             GameDirectories.AddRange(config.Ui.GameDirs.Value);
@@ -432,9 +434,6 @@ namespace Ryujinx.Ava.UI.ViewModels
             Region = (int)config.System.Region.Value;
             Language = (int)config.System.Language.Value;
             TimeZone = config.System.TimeZone;
-
-            SaveGameSyncEnabled = config.System.SaveGameSyncEnabled.Value;
-            SaveGameSyncPath = config.System.SaveGameSyncPath.Value;
 
             DateTime currentDateTime = DateTime.Now;
 
@@ -509,6 +508,8 @@ namespace Ryujinx.Ava.UI.ViewModels
             config.Ui.EnableCustomTheme.Value = EnableCustomTheme;
             config.Ui.CustomThemePath.Value = CustomThemePath;
             config.Ui.BaseStyle.Value = BaseStyleIndex == 0 ? "Light" : "Dark";
+            config.Ui.SaveGameSyncEnabled.Value = SaveGameSyncEnabled;
+            config.Ui.SaveGameSyncPath.Value = SaveGameSyncPath;
 
             // Input
             config.System.EnableDockedMode.Value = EnableDockedMode;
@@ -532,8 +533,6 @@ namespace Ryujinx.Ava.UI.ViewModels
             config.System.EnableFsIntegrityChecks.Value = EnableFsIntegrityChecks;
             config.System.ExpandRam.Value = ExpandDramSize;
             config.System.IgnoreMissingServices.Value = IgnoreMissingServices;
-            config.System.SaveGameSyncEnabled.Value = SaveGameSyncEnabled;
-            config.System.SaveGameSyncPath.Value = SaveGameSyncPath;
 
             // CPU
             config.System.EnablePtc.Value = EnablePptc;
