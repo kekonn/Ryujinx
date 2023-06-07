@@ -8,7 +8,7 @@ using System.Linq;
 namespace Ryujinx.Common.Utilities
 {
     [DebuggerDisplay("{ExportRoot}")]
-    public class SaveGameHelper
+    public class SaveGameBackupHelper
     {
         private string _exportRoot;
         private bool _isJKSVRoot;
@@ -28,7 +28,7 @@ namespace Ryujinx.Common.Utilities
             set => _isJKSVRoot = value;
         }
 
-        public SaveGameHelper(string exportRoot)
+        public SaveGameBackupHelper(string exportRoot)
         {
             if (!Directory.Exists(exportRoot))
             {
@@ -83,5 +83,7 @@ namespace Ryujinx.Common.Utilities
             return Directory.GetFiles(gameFolderPath, "*.zip", SearchOption.TopDirectoryOnly)
                 .Concat(Directory.GetDirectories(gameFolderPath)).Select(JKSVSaveGameBackup.FromString).ToArray();
         }
+        
+        
     }
 }

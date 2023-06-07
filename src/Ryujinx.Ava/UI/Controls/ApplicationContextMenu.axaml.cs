@@ -358,7 +358,7 @@ namespace Ryujinx.Ava.UI.Controls
                 return;
             }
 
-            var saveGameHelper = new SaveGameHelper(ConfigurationState.Instance.Ui.SaveGameSyncPath.Value);
+            var saveGameHelper = new SaveGameBackupHelper(ConfigurationState.Instance.Ui.SaveGameSyncPath.Value);
             var backupFolderFound =
                 saveGameHelper.TryFindExportPathForTitleId(viewModel.SelectedApplication.TitleId,
                     out var backupFolderPath);
