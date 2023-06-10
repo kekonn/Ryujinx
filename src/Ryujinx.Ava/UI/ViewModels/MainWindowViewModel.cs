@@ -78,6 +78,7 @@ namespace Ryujinx.Ava.UI.ViewModels
         private string _lastScannedAmiiboId;
         private bool _statusBarVisible;
         private ReadOnlyObservableCollection<ApplicationData> _appsObservableList;
+        private bool _saveGameBackupEnabled;
 
         private string _showUiKey = "F4";
         private string _pauseKey = "F5";
@@ -121,6 +122,10 @@ namespace Ryujinx.Ava.UI.ViewModels
 
                 Volume = ConfigurationState.Instance.System.AudioVolume;
             }
+
+            var config = ConfigurationState.Instance;
+            _saveGameBackupEnabled =
+                config.Ui.SaveGameSyncEnabled && !string.IsNullOrWhiteSpace(config.Ui.SaveGameSyncPath);
         }
 
         public void Initialize(
@@ -150,6 +155,16 @@ namespace Ryujinx.Ava.UI.ViewModels
             SwitchToGameControl = switchToGameControl;
             SetMainContent = setMainContent;
             TopLevel = topLevel;
+        }
+
+        public void ReloadConfig()
+        {
+            var config = ConfigurationState.Instance;
+            _saveGameBackupEnabled =
+                config.Ui.SaveGameSyncEnabled && !string.IsNullOrWhiteSpace(config.Ui.SaveGameSyncPath);
+            
+            OnPropertyChanged(nameof(SaveGameBackupMenuEnabled));
+            OnPropertyChanged(nameof(OpenSaveGameBackupDirectoryEnabled));
         }
 
 #region Properties
@@ -347,9 +362,9 @@ namespace Ryujinx.Ava.UI.ViewModels
 
         public bool OpenDeviceSaveDirectoryEnabled => !Utilities.IsZeros(SelectedApplication.ControlHolder.ByteSpan) && SelectedApplication.ControlHolder.Value.DeviceSaveDataSize > 0;
 
-        public bool OpenSaveGameBackupDirectoryEnabled => ConfigurationState.Instance.Ui.SaveGameSyncEnabled &&
-                                                          !string.IsNullOrWhiteSpace(ConfigurationState.Instance.Ui
-                                                              .SaveGameSyncPath);
+        public bool OpenSaveGameBackupDirectoryEnabled => _saveGameBackupEnabled;
+
+        public bool SaveGameBackupMenuEnabled => _saveGameBackupEnabled;
 
         public bool OpenBcatSaveDirectoryEnabled => !Utilities.IsZeros(SelectedApplication.ControlHolder.ByteSpan) && SelectedApplication.ControlHolder.Value.BcatDeliveryCacheStorageSize > 0;
 

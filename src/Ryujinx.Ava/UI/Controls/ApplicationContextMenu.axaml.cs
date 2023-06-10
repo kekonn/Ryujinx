@@ -57,8 +57,14 @@ namespace Ryujinx.Ava.UI.Controls
         {
             if ((sender as MenuItem)?.DataContext is MainWindowViewModel viewModel)
             {
-                OpenSaveDirectory(viewModel, SaveDataType.Account, userId: new UserId((ulong)viewModel.AccountManager.LastOpenedUser.UserId.High, (ulong)viewModel.AccountManager.LastOpenedUser.UserId.Low));
+                OpenSaveDirectory(viewModel, SaveDataType.Account, userId: GetUserIdForLastSelectedUser(viewModel));
             }
+        }
+
+        private UserId GetUserIdForLastSelectedUser(MainWindowViewModel viewModel)
+        {
+            return new UserId((ulong)viewModel.AccountManager.LastOpenedUser.UserId.High,
+                (ulong)viewModel.AccountManager.LastOpenedUser.UserId.Low);
         }
 
         public void OpenDeviceSaveDirectory_Click(object sender, RoutedEventArgs args)
@@ -93,6 +99,31 @@ namespace Ryujinx.Ava.UI.Controls
 
                 ApplicationHelper.OpenSaveDir(in saveDataFilter, titleIdNumber, viewModel.SelectedApplication.ControlHolder, viewModel.SelectedApplication.TitleName);
             }
+        }
+
+        private static bool CreateSaveDataFilterForSelectedGame(MainWindowViewModel viewModel,
+            SaveDataType saveDataType, UserId userId, out SaveDataFilter saveDataFilter)
+        {
+            saveDataFilter = default;
+            
+            if (viewModel?.SelectedApplication is null)
+            {
+                return false;
+            }
+            
+            if (!ulong.TryParse(viewModel.SelectedApplication.TitleId, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out ulong titleIdNumber))
+            {
+                Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(LocaleManager.Instance[LocaleKeys.DialogRyujinxErrorMessage], LocaleManager.Instance[LocaleKeys.DialogInvalidTitleIdErrorMessage]);
+                });
+
+                return false;
+            }
+
+            saveDataFilter = SaveDataFilter.Make(titleIdNumber, saveDataType, userId, saveDataId: default, index: default);
+
+            return true;
         }
 
         public async void OpenTitleUpdateManager_Click(object sender, RoutedEventArgs args)
@@ -346,7 +377,7 @@ namespace Ryujinx.Ava.UI.Controls
             }
 
             if (!ulong.TryParse(viewModel.SelectedApplication.TitleId, NumberStyles.HexNumber,
-                    CultureInfo.InvariantCulture, out ulong titleIdNumber))
+                    CultureInfo.InvariantCulture, out ulong _))
             {
                 Dispatcher.UIThread.InvokeAsync(async () =>
                 {
@@ -376,6 +407,65 @@ namespace Ryujinx.Ava.UI.Controls
             }
             
             OpenHelper.OpenFolder(backupFolderPath);
+        }
+
+        private void CreateNewSaveGameBackupClick(object sender, RoutedEventArgs e)
+        {
+            var viewModel = (sender as MenuItem)?.DataContext as MainWindowViewModel;
+
+            if (viewModel?.SelectedApplication is null)
+            {
+                return;
+            }
+            
+            if (!ulong.TryParse(viewModel.SelectedApplication.TitleId, NumberStyles.HexNumber,
+                    CultureInfo.InvariantCulture, out ulong titleId))
+            {
+                Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(
+                        LocaleManager.Instance[LocaleKeys.DialogRyujinxErrorMessage],
+                        LocaleManager.Instance[LocaleKeys.DialogInvalidTitleIdErrorMessage]);
+                });
+
+                return;
+            }
+            
+            CreateSaveDataFilterForSelectedGame(viewModel, SaveDataType.Account,
+                GetUserIdForLastSelectedUser(viewModel), out var saveDataFilter);
+
+            if (!ApplicationHelper.TryFindSaveData(viewModel.SelectedApplication.TitleName, titleId,
+                    viewModel.SelectedApplication.ControlHolder, in saveDataFilter, out var saveDataId))
+            {
+                Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(
+                        LocaleManager.Instance[LocaleKeys.DialogRyujinxErrorMessage],
+                        LocaleManager.Instance[LocaleKeys.DialogMessageSaveNotAvailableCreateSaveMessage]);
+                });
+                
+                return;
+            }
+            
+            
+            var savePath = ApplicationHelper.GetSavePathDir(saveDataId);
+            var saveGameHelper = new SaveGameBackupHelper(ConfigurationState.Instance.Ui.SaveGameSyncPath.Value);
+            var exportPathExists =
+                saveGameHelper.TryFindExportPathForTitleId(viewModel.SelectedApplication.TitleId, out var exportPath);
+
+            if (!exportPathExists)
+            {
+                Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    await ContentDialogHelper.CreateErrorDialog(
+                        LocaleManager.Instance[LocaleKeys.DialogRyujinxErrorMessage],
+                        LocaleManager.Instance[LocaleKeys.SaveGameExportPathDoesNotExistMessage]);
+                });
+                
+                return;
+            }
+            
+            // TODO: continue here, copy the files
         }
     }
 }

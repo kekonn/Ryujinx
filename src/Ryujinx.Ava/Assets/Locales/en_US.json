@@ -650,5 +650,9 @@
   "NetworkInterfaceDefault": "Default",
   "PackagingShaders": "Packaging Shaders",
   "AboutChangelogButton": "View Changelog on GitHub",
-  "AboutChangelogButtonTooltipMessage": "Click to open the changelog for this version in your default browser."
+  "AboutChangelogButtonTooltipMessage": "Click to open the changelog for this version in your default browser.",
+  "SaveGameBackupContextMenuHeader": "Save game backups",
+  "OpenSaveGameBackupDirectoryMenuHeader": "Open save game backup directory",
+  "CreateSaveGameBackupMenuHeader": "Create new save game backup",
+  "SaveGameExportPathDoesNotExistMessage": "The export path does not exist."
 }

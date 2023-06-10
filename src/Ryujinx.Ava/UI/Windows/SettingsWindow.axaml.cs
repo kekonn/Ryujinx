@@ -42,6 +42,7 @@ namespace Ryujinx.Ava.UI.Windows
             if (Owner is MainWindow window && ViewModel.DirectoryChanged)
             {
                 window.ViewModel.LoadApplications();
+                window.ViewModel.ReloadConfig();
             }
         }
 

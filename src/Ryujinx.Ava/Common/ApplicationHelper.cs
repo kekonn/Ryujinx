@@ -46,7 +46,7 @@ namespace Ryujinx.Ava.Common
             _accountManager = accountManager;
         }
 
-        private static bool TryFindSaveData(string titleName, ulong titleId, BlitStruct<ApplicationControlProperty> controlHolder, in SaveDataFilter filter, out ulong saveDataId)
+        public static bool TryFindSaveData(string titleName, ulong titleId, BlitStruct<ApplicationControlProperty> controlHolder, in SaveDataFilter filter, out ulong saveDataId)
         {
             saveDataId = default;
 
@@ -110,6 +110,36 @@ namespace Ryujinx.Ava.Common
             }
 
             OpenSaveDir(saveDataId);
+        }
+
+        public static DirectoryInfo GetSavePathDir(ulong saveDataId)
+        {
+            string saveRootPath = Path.Combine(_virtualFileSystem.GetNandPath(), $"user/save/{saveDataId:x16}");
+
+            if (!Directory.Exists(saveRootPath))
+            {
+                // Inconsistent state. Create the directory
+                Directory.CreateDirectory(saveRootPath);
+            }
+
+            string committedPath = Path.Combine(saveRootPath, "0");
+            string workingPath = Path.Combine(saveRootPath, "1");
+
+            if (Directory.Exists(committedPath))
+            {
+                return new DirectoryInfo(committedPath);
+            }
+            else
+            {
+                // If the working directory exists and the committed directory doesn't,
+                // the working directory will be loaded the next time the savedata is mounted
+                if (!Directory.Exists(workingPath))
+                {
+                    Directory.CreateDirectory(workingPath);
+                }
+
+                return new DirectoryInfo(workingPath);
+            }
         }
 
         public static void OpenSaveDir(ulong saveDataId)

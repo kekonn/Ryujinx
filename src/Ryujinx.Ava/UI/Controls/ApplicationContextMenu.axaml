@@ -28,7 +28,7 @@
         ToolTip.Tip="{locale:Locale GameListContextMenuOpenBcatSaveDirectoryToolTip}" />
     <MenuItem
         Click="OpenSaveGameBackupDirectory_Click"
-        Header="Open save game backup directory"
+        Header="{locale:Locale OpenSaveGameBackupDirectoryMenuHeader}"
         IsEnabled="{Binding OpenSaveGameBackupDirectoryEnabled}"/>
     <Separator />
     <MenuItem
@@ -83,5 +83,11 @@
             Click="ExtractApplicationLogo_Click"
             Header="{locale:Locale GameListContextMenuExtractDataLogo}"
             ToolTip.Tip="{locale:Locale GameListContextMenuExtractDataLogoToolTip}" />
+    </MenuItem>
+    <MenuItem Header="{locale:Locale SaveGameBackupContextMenuHeader}"
+              IsEnabled="{Binding SaveGameBackupMenuEnabled}">
+        <MenuItem 
+            Header="{locale:Locale CreateSaveGameBackupMenuHeader}"
+            Click="CreateNewSaveGameBackupClick"/>
     </MenuItem>
 </MenuFlyout>
