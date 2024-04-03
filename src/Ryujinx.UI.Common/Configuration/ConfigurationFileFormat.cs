@@ -15,7 +15,7 @@ namespace Ryujinx.UI.Common.Configuration
         /// <summary>
         /// The current version of the file format
         /// </summary>
-        public const int CurrentVersion = 49;
+        public const int CurrentVersion = 50;
 
         /// <summary>
         /// Version of the configuration file format
@@ -375,6 +375,16 @@ namespace Ryujinx.UI.Common.Configuration
         /// Uses Hypervisor over JIT if available
         /// </summary>
         public bool UseHypervisor { get; set; }
+        
+        /// <summary>
+        /// Enable External save games mirror
+        /// </summary>
+        public bool EnableExternalSaveGames { get; set; }
+        
+        /// <summary>
+        /// Root folder for external save games mirror
+        /// </summary>
+        public string ExternalSaveGamesRoot { get; set; }
 
         /// <summary>
         /// Loads a configuration file from disk

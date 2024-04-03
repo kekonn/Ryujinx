@@ -21,6 +21,7 @@ using Ryujinx.UI.Common.Configuration.System;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -50,6 +51,7 @@ namespace Ryujinx.Ava.UI.ViewModels
         private int _graphicsBackendIndex;
         private int _scalingFilter;
         private int _scalingFilterLevel;
+        private bool _externalRootChanged;
 
         public event Action CloseWindow;
         public event Action SaveSettingsEvent;
@@ -267,6 +269,9 @@ namespace Ryujinx.Ava.UI.ViewModels
                 ConfigurationState.Instance.Multiplayer.Mode.Value = (MultiplayerMode)_multiplayerModeIndex;
             }
         }
+        
+        public bool EnableExternalSaveGames { get; set; }
+        public string ExternalSaveGamesRoot { get; set; }
 
         public SettingsViewModel(VirtualFileSystem virtualFileSystem, ContentManager contentManager) : this()
         {
@@ -392,6 +397,34 @@ namespace Ryujinx.Ava.UI.ViewModels
             }
         }
 
+        public void ExternalSaveGamesToggled()
+        {
+            Dispatcher.UIThread.Post(() => OnPropertyChanged(nameof(EnableExternalSaveGames)));
+        }
+
+        public void SetExternalSaveGamesRoot(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
+                Logger.Warning?.Print(LogClass.UI, $"Directory '{path}' is not valid as an external save games root.");
+                // TODO: Show error messagebox
+                return;
+            }
+
+            Logger.Debug?.Print(LogClass.Application, $"Old external root: '{ExternalSaveGamesRoot}', new external root: '{path}'");
+            var oldPath = ExternalSaveGamesRoot ?? string.Empty;
+            var newPath = Path.GetFullPath(path);
+            if (oldPath.Equals(newPath))
+            {
+                return;
+            }
+            
+            _externalRootChanged = true;
+            ExternalSaveGamesRoot = Path.GetFullPath(path);
+            
+            Dispatcher.UIThread.Post(() => OnPropertyChanged(nameof(ExternalSaveGamesRoot)));
+        }
+
         public void LoadCurrentConfiguration()
         {
             ConfigurationState config = ConfigurationState.Instance;
@@ -404,6 +437,9 @@ namespace Ryujinx.Ava.UI.ViewModels
 
             GameDirectories.Clear();
             GameDirectories.AddRange(config.UI.GameDirs.Value);
+
+            EnableExternalSaveGames = config.UI.EnableExternalSaveGames;
+            ExternalSaveGamesRoot = config.UI.ExternalSaveGamesRoot;
 
             BaseStyleIndex = config.UI.BaseStyle == "Light" ? 0 : 1;
 
@@ -485,6 +521,8 @@ namespace Ryujinx.Ava.UI.ViewModels
             config.CheckUpdatesOnStart.Value = CheckUpdatesOnStart;
             config.ShowConfirmExit.Value = ShowConfirmExit;
             config.HideCursor.Value = (HideCursorMode)HideCursor;
+            config.UI.EnableExternalSaveGames.Value = EnableExternalSaveGames;
+            config.UI.ExternalSaveGamesRoot.Value = ExternalSaveGamesRoot;
 
             if (_directoryChanged)
             {
@@ -494,6 +532,14 @@ namespace Ryujinx.Ava.UI.ViewModels
 
             config.UI.BaseStyle.Value = BaseStyleIndex == 0 ? "Light" : "Dark";
 
+            if (_externalRootChanged && EnableExternalSaveGames)
+            {
+                Logger.Info?.Print(LogClass.Application, $"External save games root has changed.");
+                // TODO: Ask to migrate external save game root
+                config.UI.ExternalSaveGamesRoot.Value = ExternalSaveGamesRoot;
+            }
+            config.UI.EnableExternalSaveGames.Value = EnableExternalSaveGames;
+            
             // Input
             config.System.EnableDockedMode.Value = EnableDockedMode;
             config.Hid.EnableKeyboard.Value = EnableKeyboard;
@@ -582,6 +628,7 @@ namespace Ryujinx.Ava.UI.ViewModels
             SaveSettingsEvent?.Invoke();
 
             _directoryChanged = false;
+            _externalRootChanged = false;
         }
 
         private static void RevertIfNotSaved()

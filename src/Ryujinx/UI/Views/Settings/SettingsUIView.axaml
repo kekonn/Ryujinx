@@ -72,6 +72,42 @@
                     </StackPanel>
                 </StackPanel>
                 <Separator Height="1" />
+                <TextBlock Classes="h1" Text="{locale:Locale SettingsTabGeneralExternalSaveGames}" />
+                <StackPanel
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    Orientation="Vertical"
+                    Spacing="10">
+                    <CheckBox IsChecked="{Binding EnableExternalSaveGames}" 
+                              IsCheckedChanged="EnableExternalSaveGames_OnIsCheckedChanged">
+                        <TextBlock
+                            Text="{locale:Locale SettingsTabGeneralExternalSaveGamesEnabled}" />
+                    </CheckBox>
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            Name="ExternalSaveGameRootBox"
+                            Margin="0"
+                            IsEnabled="{Binding EnableExternalSaveGames}"
+                            ToolTip.Tip="{locale:Locale AddGameDirBoxTooltip}"
+                            Text="{Binding ExternalSaveGamesRoot}"
+                            VerticalAlignment="Stretch" />
+                        <Button
+                            Name="BrowseExternalSaveGameRootButton"
+                            Grid.Column="1"
+                            MinWidth="90"
+                            IsEnabled="{Binding EnableExternalSaveGames}"
+                            Click="BrowseExternalSaveGameRootButton_OnClick"
+                            Margin="10,0,0,0">
+                            <TextBlock HorizontalAlignment="Center"
+                                       Text="{locale:Locale SettingsTabGeneralExternalSaveGameBrowse}" />
+                        </Button>
+                    </Grid>
+                </StackPanel>
+                <Separator Height="1" />
                 <TextBlock Classes="h1" Text="{locale:Locale SettingsTabGeneralGameDirectories}" />
                 <StackPanel
                     Margin="10,0,0,0"

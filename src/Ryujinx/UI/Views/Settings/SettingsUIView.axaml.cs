@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
-using Ryujinx.Ava.Common.Locale;
 using Ryujinx.Ava.UI.ViewModels;
 using System.Collections.Generic;
 using System.IO;
@@ -59,6 +58,37 @@ namespace Ryujinx.Ava.UI.Views.Settings
             if (GameList.ItemCount > 0)
             {
                 GameList.SelectedIndex = oldIndex < GameList.ItemCount ? oldIndex : 0;
+            }
+        }
+
+        private void EnableExternalSaveGames_OnIsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            ViewModel?.ExternalSaveGamesToggled();
+        }
+
+        private async void BrowseExternalSaveGameRootButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (this.GetVisualRoot() is not Window window)
+            {
+                return;
+            }
+
+            string existingPath = ViewModel.ExternalSaveGamesRoot;
+            IStorageFolder existingFolder = null;
+            if (!string.IsNullOrWhiteSpace(existingPath) && Directory.Exists(existingPath))
+            {
+                existingFolder = await window.StorageProvider.TryGetFolderFromPathAsync(existingPath);
+            }
+            
+            var result =
+                await window.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+                {
+                    AllowMultiple = false,
+                    SuggestedStartLocation = existingFolder
+                });
+            if (result is {Count: 1})
+            {
+                ViewModel?.SetExternalSaveGamesRoot(result[0].Path.LocalPath);
             }
         }
     }

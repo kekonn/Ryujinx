@@ -185,7 +185,17 @@ namespace Ryujinx.UI.Common.Configuration
             /// Sets if Grid is ordered in Ascending Order
             /// </summary>
             public ReactiveObject<bool> IsAscendingOrder { get; private set; }
+            
+            /// <summary>
+            /// Enable external save games mirror
+            /// </summary>
+            public ReactiveObject<bool> EnableExternalSaveGames { get; private set; }
 
+            /// <summary>
+            /// External save games mirror root folder
+            /// </summary>
+            public ReactiveObject<string> ExternalSaveGamesRoot { get; private set; }
+            
             public UISection()
             {
                 GuiColumns = new Columns();
@@ -205,6 +215,10 @@ namespace Ryujinx.UI.Common.Configuration
                 LanguageCode = new ReactiveObject<string>();
                 ShowConsole = new ReactiveObject<bool>();
                 ShowConsole.Event += static (s, e) => { ConsoleHelper.SetConsoleWindowState(e.NewValue); };
+                EnableExternalSaveGames = new ReactiveObject<bool>();
+                EnableExternalSaveGames.Event += static (s, e) => { LogValueChange(e, e.NewValue.ToString()); };
+                ExternalSaveGamesRoot = new ReactiveObject<string>();
+                ExternalSaveGamesRoot.Event += static (s, e) => { LogValueChange(e, e.NewValue); };
             }
         }
 
@@ -713,6 +727,8 @@ namespace Ryujinx.UI.Common.Configuration
                     SortAscending = UI.ColumnSort.SortAscending,
                 },
                 GameDirs = UI.GameDirs,
+                EnableExternalSaveGames = UI.EnableExternalSaveGames,
+                ExternalSaveGamesRoot = UI.ExternalSaveGamesRoot,
                 ShownFileTypes = new ShownFileTypes
                 {
                     NSP = UI.ShownFileTypes.NSP,
@@ -841,6 +857,8 @@ namespace Ryujinx.UI.Common.Configuration
             UI.WindowStartup.WindowPositionX.Value = 0;
             UI.WindowStartup.WindowPositionY.Value = 0;
             UI.WindowStartup.WindowMaximized.Value = false;
+            UI.EnableExternalSaveGames.Value = false;
+            UI.ExternalSaveGamesRoot.Value = string.Empty;
             Hid.EnableKeyboard.Value = false;
             Hid.EnableMouse.Value = false;
             Hid.Hotkeys.Value = new KeyboardHotkeys
@@ -1442,6 +1460,16 @@ namespace Ryujinx.UI.Common.Configuration
                 configurationFileUpdated = true;
             }
 
+            if (configurationFileFormat.Version < 50)
+            {
+                Ryujinx.Common.Logging.Logger.Warning?.Print(LogClass.Application, $"Outdated configuration version {configurationFileFormat.Version}, migrating to version 50.");
+
+                configurationFileFormat.EnableExternalSaveGames = false;
+                configurationFileFormat.ExternalSaveGamesRoot = string.Empty;
+
+                configurationFileUpdated = true;
+            }
+
             Logger.EnableFileLog.Value = configurationFileFormat.EnableFileLog;
             Graphics.ResScale.Value = configurationFileFormat.ResScale;
             Graphics.ResScaleCustom.Value = configurationFileFormat.ResScaleCustom;
@@ -1523,6 +1551,8 @@ namespace Ryujinx.UI.Common.Configuration
             UI.WindowStartup.WindowPositionX.Value = configurationFileFormat.WindowStartup.WindowPositionX;
             UI.WindowStartup.WindowPositionY.Value = configurationFileFormat.WindowStartup.WindowPositionY;
             UI.WindowStartup.WindowMaximized.Value = configurationFileFormat.WindowStartup.WindowMaximized;
+            UI.EnableExternalSaveGames.Value = configurationFileFormat.EnableExternalSaveGames;
+            UI.ExternalSaveGamesRoot.Value = configurationFileFormat.ExternalSaveGamesRoot;
             Hid.EnableKeyboard.Value = configurationFileFormat.EnableKeyboard;
             Hid.EnableMouse.Value = configurationFileFormat.EnableMouse;
             Hid.Hotkeys.Value = configurationFileFormat.Hotkeys;
